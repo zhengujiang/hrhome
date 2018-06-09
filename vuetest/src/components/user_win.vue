@@ -1,17 +1,22 @@
+/*
+ * @Author: zhengu.jiang 
+ * @Date: 2018-05-14 18:19:13 
+ * @Module: {账户弹框} 
+ */
 <template>
-    <el-dialog title="添加账号" :visible.sync="showForm" @close="close">
-        <el-form :model="form" label-width="75px" :rules="rules" ref="form" class="ruleForm">
-            <el-form-item label="姓名" prop="name">
+    <el-dialog :title="title" :visible.sync="showForm" @close="close">
+        <el-form :model="form" label-width="75px" ref="form" class="ruleForm">
+            <el-form-item label="姓名">
                 <el-input v-model="form.name"></el-input>
             </el-form-item>
-            <el-form-item label="账号" prop="account">
+            <el-form-item v-if="!edit" label="账号">
                 <el-input v-model="form.account"></el-input>
             </el-form-item>
-            <el-form-item label="密码" prop="password">
-                <el-input v-model="form.password"></el-input>
+            <el-form-item v-if="!edit" label="密码">
+                <el-input type="password" v-model="form.password"></el-input>
             </el-form-item>
-            <el-form-item label="权限" prop="rule">
-                <el-select v-model="form.rule" placeholder="请选择职位" style="width:325px">
+            <el-form-item label="权限">
+                <el-select v-model="ruleName" placeholder="请选择职位" style="width:325px">
                     <el-option
                         v-for="item in options"
                         :key="item.id"
@@ -47,11 +52,22 @@ export default {
             },
             options: [],
             showForm: false,
+            edit: false,
+            ruleName: '',
+            title: ''
         }
     },
-    props: ['dialogForm'],
+    props: ['dialogForm','info'],
     mounted(){
         this.showForm = this.dialogForm;
+        this.title = "添加账号"
+        if(this.info) {
+            this.edit = true;
+            this.form.name = this.info.name;
+            this.ruleName = this.info.rule_name;
+            this.title = '编辑'
+        }
+
         this.init();
     },
     methods: {
@@ -78,21 +94,46 @@ export default {
             this.$emit('close','close');
         },
         submitForm(formName) {
-            this.$refs[formName].validate((valid) => {
-                if (valid) {
-                    this.tableData.push(this.form)
-                    if(this.tableData[0].password.length < 6){
-                        this.$alert("密码长度不能小于6", '温馨提示', {
-                            confirmButtonText: '确定',
-                            callback: ()=>{}
-                        });
-                    }else{
-                        this.$emit('close','ok',this.tableData);
-                    }
-                } else {
-                    return false;
+            if(!this.form.name){
+                this.$alert('请输入姓名', '温馨提示', {confirmButtonText: '确定',callback: ()=>{}});
+                return false
+            }
+            if(!this.edit){
+                this.form.rule = this.ruleName;
+                if(!this.form.account){
+                    this.$alert('请输入账户', '温馨提示', {confirmButtonText: '确定',callback: ()=>{}});
+                    return false
                 }
-            });
+                if(!this.form.password){
+                    this.$alert('请输入密码', '温馨提示', {confirmButtonText: '确定',callback: ()=>{}});
+                    return false
+                }
+                if(!this.form.rule){
+                    this.$alert('请选择权限', '温馨提示', {confirmButtonText: '确定',callback: ()=>{}});
+                    return false
+                }
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.tableData.push(this.form)
+                        if(this.tableData[0].password.length < 6){
+                            this.$alert("密码长度不能小于6", '温馨提示', {
+                                confirmButtonText: '确定',
+                                callback: ()=>{}
+                            });
+                        }else{
+                            this.$emit('close','ok',this.tableData,'add');
+                        }
+                    } else {
+                        return false;
+                    }
+                });
+            }else{
+                let item = {
+                    rule_id: this.ruleName > 0 ? this.ruleName : this.info.rule_id,
+                    name: this.form.name
+                }
+                this.$emit('close','ok',item,'edit',this.info.id);
+            }
             
         },
         close(){

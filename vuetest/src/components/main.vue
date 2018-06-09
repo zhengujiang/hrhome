@@ -3,8 +3,17 @@
     <header class="clearfix">
       <div class="logo fl"><img src="../image/logo.png" alt="logo"></div>
       <div class="user fr">
-        <span>{{userName}}</span>
-        <span @click="signOut" class="signOut">退出</span>
+        <el-dropdown style="height:60px;cursor:pointer" :show-timeout='0'>
+          <span class="el-dropdown-link">
+            {{userName}}<i style="margin-left:25px;" class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item><i @click="editPass" style="display:inline-block;width:100%;height:100%">修改密码</i></el-dropdown-item>
+            <el-dropdown-item><i @click="signOut" style="display:inline-block;width:100%;height:100%">退出</i></el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+        <!-- <span>{{userName}}</span>
+        <span @click="signOut" class="signOut">退出</span> -->
       </div>
     </header>
     <div class="content">
@@ -37,6 +46,7 @@
             <router-view class="box" name="details_header"></router-view>
           </div>
           <router-view class="box details" name="details_con"></router-view>
+        <edit v-if="showForm" :show="showForm" @close="close"></edit>
       </div>
     </div>
   </div>
@@ -44,6 +54,7 @@
 
 <script>
 import api from "./http.js"
+import edit from "./password_win"
 export default {
   data() {
     return {
@@ -52,7 +63,8 @@ export default {
       login: true,
       leftHeight: 500,
       menu: [],
-      token: ''
+      token: '',
+      showForm: 0,
     };
   },
   created(){
@@ -60,6 +72,9 @@ export default {
     this.menu = data.menu;
     this.userName = data.name
     this.token = data.token
+  },
+  components: {
+    edit
   },
   mounted(){
     this.leftHeight = document.documentElement.clientHeight - 100;
@@ -87,34 +102,21 @@ export default {
         params: name.split(',')
       });
     },
+    close(){
+      this.showForm = false;
+    },
+    editPass(){
+      this.showForm = true;
+    },
     //退出
     signOut(){
       this.$router.push('/')
       sessionStorage.setItem('token', '');
       sessionStorage.setItem('menu', '');
-      // this.$http.get(api + "/api/login/logout" )
-      // .then((res)=>{
-      //   if(res.data.code == 200){
-      //     this.$router.push('/')
-      //     sessionStorage.setItem('token', '');
-      //   }else{
-      //     this.$alert(res.data.error, '温馨提示', {
-      //       confirmButtonText: '确定',
-      //       callback: ()=>{}
-      //     });
-      //   }
-      // })
-      // .catch((error)=>{
-      //   this.$alert(error, '温馨提示', {
-      //       confirmButtonText: '确定',
-      //       callback: ()=>{}
-      //   });
-      // })
       
     },
     selectMenu(index,indexPath){
       this.$router.push('/admin/' + index);
-      console.log(index)
       let name = indexPath;
       for(let i = 0; i < this.menu.length; i++){
         for(let j = 0; j < this.menu[i].child.length; j++){

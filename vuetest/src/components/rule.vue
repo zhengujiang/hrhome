@@ -8,6 +8,7 @@
     <div>
         <el-button type="primary" @click="add">添加用户组</el-button>
         <el-table
+            v-loading="loading"
             :data="tableData"
             border
             style="width: 1002px;margin-top:20px;">
@@ -53,6 +54,7 @@ export default {
             innerVisible: false,
             rule: '',
             edit: false,
+            loading: true,
         }
     },
     components: {
@@ -76,6 +78,7 @@ export default {
                         all.child = all.child.concat(this.nodeList[i].child)
                     }
                     this.nodeList.unshift(all);
+                    this.loading = false;
                 }else{
                     this.$alert(res.data.error, '温馨提示', {
                         confirmButtonText: '确定',

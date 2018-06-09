@@ -20,7 +20,6 @@
 		},
 		computed: {
 			headerTil: function() {
-				console.log(this.$store.state.headerTil)
 				return this.$store.state.headerTil;
 			},
 		},

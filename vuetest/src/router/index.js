@@ -7,20 +7,24 @@ const main = () => import( /* webpackChunkName: "main" */ '@/components/main');
 //面包屑
 const detailsHeader = () => import( /* webpackChunkName:"details_header" */ '@/components/details_header');
 // const homePage = () => import( /* webpackChunkName: "home_page" */ '@/components/home_page');
-const project = () => import( /* webpackChunkName: "project" */ '@/components/project');
-const resume = () => import( /* webpackChunkName: "resume" */ '@/components/resume');
+// const project = () => import( /* webpackChunkName: "project" */ '@/components/project');
+// const resume = () => import( /* webpackChunkName: "resume" */ '@/components/resume');
 //账户管理
 const user = () => import( /* webpackChunkName: "user" */ '@/components/user');
 //权限设置
 const rule = () => import( /* webpackChunkName:"rule" */ '@/components/rule');
 //人才库
 const talent = () => import( /* webpackChunkName:"talent" */ '@/components/talent');
+//简历详情
+const resume = () =>import ( /* webpackChunkName:"talent_detail" */ '@/components/talent_detail');
 //客户列表
 const customer = () => import( /* webpackChunkName:"customer" */ '@/components/customer');
 //新增公司客户
 const company = () => import ( /* webpackChunkName:"customer_detail" */ '@/components/customer_detail');
 //新增职位
 const job = () => import ( /* webpackChunkName:"job_detail" */ '@/components/job_detail');
+//图片管理
+const image = () => import ( /* webpackChunkName:"photo" */ '@/components/photo');
 
 
 
@@ -54,7 +58,15 @@ export default new Router({
             components: {
               details_con: user
             }
-          },{
+          },
+          {
+            path: 'image',
+            name: 'image',
+            components: {
+              details_con: image
+            }
+          },
+          {
             path: 'rule',
             name: 'rule',
             components: {
@@ -64,8 +76,24 @@ export default new Router({
             path: 'talent',
             name: 'talent',
             components: {
-              details_con: talent
-            }
+              details_con: details_con
+            },
+            children: [
+              {
+                path: '',
+                name: 'talent',
+                components: {
+                  details_con: talent
+                }
+              },
+              {
+                path: 'resume',
+                name: 'resume',
+                components: {
+                  details_con: resume
+                }
+              }
+            ]
           },{
             path: 'customer',
             name: 'customer',
